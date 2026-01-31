@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Culona del Tiempo — Mundo</title>
+    <link rel="icon" type="image/png" href="culonanaranja.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overlay: rgba(224, 242, 254, 0.65);
+            --text-color: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --ai-bg: rgba(255, 255, 255, 0.95);
+            --accent-orange: #f97316;
+        }
+        [data-theme='dark'] {
+            --bg-overlay: rgba(15, 23, 42, 0.75);
+            --text-color: #f1f5f9;
+            --card-bg: rgba(30, 41, 59, 0.9);
+            --ai-bg: #18181b;
+            --accent-orange: #fb923c;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Rubik', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-fixed-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-image: url(mardel.jpeg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: blur(5px);
+            transform: scale(1.05);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: var(--bg-overlay);
+            transition: background-color 0.3s ease;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(249, 115, 22, 0.2);
+            transition: all 0.3s ease;
+            margin: 0 6px;
+        }
+        .socials { display:flex; gap:8px; align-items:center; justify-content:center }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--accent-orange);
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        /* Home logo (small orange house) */
+        .home-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 110;
+            background: transparent;
+            cursor: pointer;
+        }
+        .home-logo svg { width:28px; height:28px; fill: var(--accent-orange); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12)); }
+
+        .copyright-footer { margin-top: 1.5rem; font-size: 0.65rem; font-weight:700; letter-spacing:1px; color:var(--text-color); opacity:0.7; text-transform:uppercase; text-align:center }
+
+        /* Animación de entrada suave */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            animation: fadeUp 2s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-fixed-image"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- Home logo (top-left) -->
+    <a href="index.html" class="home-logo" aria-label="Inicio">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 3.172l8 6.182V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1V9.354l8-6.182zM12 1L2 8v13a3 3 0 0 0 3 3h5v-8h4v8h5a3 3 0 0 0 3-3V8L12 1z"/>
+        </svg>
+    </a>
+
+    <button class="theme-toggle" id="themeBtn" title="Cambiar tema">
+        <svg class="icon-light w-5 h-5" viewBox="0 0 24 24" fill="#FF85A1">
+            <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/>
+        </svg>
+        <svg class="icon-dark hidden w-5 h-5" viewBox="0 0 24 24" fill="#38bdf8">
+            <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/>
+        </svg>
+    </button>
+
+    <!-- External hashtag feed (will show posts from social APIs via a backend) -->
+    <div id="culona-external-feed" style="display:none; width:100%; max-width:720px; margin:22px auto 6px; text-align:center;
+        display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
+    "></div>
+
+    <div class="fade-in-up" style="text-align: center; max-width: 600px; margin: 30px auto; padding: 25px; font-weight: 500; line-height: 1.6; background-color: var(--card-bg); border-radius: 20px; backdrop-filter: blur(10px); border: 2px solid rgba(249, 115, 22, 0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        Muy pronto podrás ver tu contenido de la Estrella Culona aqui en esta sección.
+        Para eso, puedes mandarnos por privado la/s foto/s y/o video/s para ser posteados aquí. 
+        También puedes hacerlo en tus redes sociales junto al <span style="color: var(--accent-orange); font-weight: 900;">#culonaxelmundo</span> y tus screenshots de la página.
+    </div>
+
+    <div style="margin-top:120px; text-align:center">
+        <div class="socials">
+            <a href="https://www.instagram.com/lacoleccionistadetesoros3d" target="_blank" class="social-link" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a href="https://x.com/cami1023ds" target="_blank" class="social-link" aria-label="X">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://cults3d.com/es/usuarios/CamilaDiaz/modelos-3d" target="_blank" class="social-link" aria-label="Cults3D">
+                <svg viewBox="0 0 100 100" width="20" height="20"><path d="M38 52 A22 22 0 1 1 60 30 A22 22 0 0 1 38 52 M38 52 A22 22 0 1 1 16 74 A22 22 0 0 1 38 52 M38 52 A22 22 0 1 1 60 74 A22 22 0 0 1 38 52" fill="none" stroke="currentColor" stroke-width="6"/></svg>
+            </a>
+            <a href="https://cafecito.app/camiladiaz" target="_blank" class="social-link" aria-label="Cafecito">
+                <svg viewBox="0 0 100 100" width="20" height="20"><path d="M25 40 L25 65 C25 75 35 85 50 85 C65 85 75 75 75 65 L75 40 Z" fill="none" stroke="currentColor" stroke-width="5"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="copyright-footer">© 2026 LA COLECCIONISTA DE TESOROS 3D</div>
+
+    <script>
+        document.getElementById('themeBtn').onclick = () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', target);
+            document.querySelector('.icon-light').classList.toggle('hidden');
+            document.querySelector('.icon-dark').classList.toggle('hidden');
+        };
+        /* --- External social-feed loader ---
+           To enable, host a JSON endpoint (CORS-enabled) and assign its URL to SOCIAL_FEED_URL.
+           Endpoint must return an array of items: [{id, type: 'image'|'video', url, source, permalink}]
+           Example item: {"id":123,"type":"image","url":"https://.../img.jpg","source":"Twitter","permalink":"https://twitter.com/..."}
+        */
+        (function(){
+            const SOCIAL_FEED_URL = 'http://localhost:3000/feed?tag=culonaxelmundo'; // local backend endpoint
+            const FEED_POLL_MS = 60 * 1000; // poll each minute
+            const feedEl = document.getElementById('culona-external-feed');
+
+            if(!SOCIAL_FEED_URL) return; // not configured
+
+            async function fetchFeed(){
+                try{
+                    const r = await fetch(SOCIAL_FEED_URL);
+                    if(!r.ok) throw new Error('feed error');
+                    const items = await r.json();
+                    renderFeed(items || []);
+                }catch(e){
+                    console.warn('Failed to fetch social feed', e);
+                }
+            }
+
+            function renderFeed(items){
+                if(!items || items.length === 0){ feedEl.style.display = 'none'; return; }
+                feedEl.innerHTML = '';
+                feedEl.style.display = 'flex';
+                // show newest first, limit to 6
+                items.slice().reverse().slice(0,6).forEach(item => {
+                    let node;
+                    if(item.type === 'video'){
+                        node = document.createElement('video');
+                        node.src = item.url;
+                        node.controls = true;
+                        node.className = 'culona-video';
+                    } else {
+                        node = document.createElement('img');
+                        node.src = item.url;
+                        node.className = 'culona-thumb';
+                    }
+                    const a = document.createElement('a');
+                    a.href = item.permalink || item.url || '#';
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.title = item.source || '';
+                    a.appendChild(node);
+                    feedEl.appendChild(a);
+                });
+            }
+
+            // initial fetch and polling
+            fetchFeed();
+            setInterval(fetchFeed, FEED_POLL_MS);
+        })();
+    </script>
+</body>
+</html>

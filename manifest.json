@@ -1,0 +1,49 @@
+{
+  "name": "La Culona del Tiempo",
+  "short_name": "La Culona",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "culonanaranja.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "culonanaranja.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Consultar Outfit",
+      "short_name": "Outfit",
+      "description": "Ver qué me pongo hoy",
+      "url": "./index.html?action=outfit",
+      "icons": [{ "src": "culonanaranja.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Consultar Plan",
+      "short_name": "Plan",
+      "description": "Ver qué hacer hoy",
+      "url": "./index.html?action=plan",
+      "icons": [{ "src": "culonanaranja.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "widgets": [
+    {
+      "name": "La Culona Clima",
+      "description": "Estado actual de la estrella y temperatura",
+      "tag": "culona-weather",
+      "template": "widget",
+      "ms_ac_template": "widget.html",
+      "data": "widget.html",
+      "type": "text/html",
+      "icons": [{ "src": "culonanaranja.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget La Culona</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: transparent; /* Fondo transparente para el widget */
+            font-family: 'Rubik', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .widget-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Fondo semitransparente opcional para legibilidad */
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .character-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            margin-bottom: 5px;
+        }
+        .temp {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #f97316; /* Naranja */
+            text-shadow: 2px 2px 0px #fff;
+            margin: 0;
+        }
+        .city {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            margin-top: 5px;
+            background: rgba(255,255,255,0.8);
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-box">
+        <img id="star-img" class="character-img" src="culonaazul.png" alt="Estrella">
+        <div class="temp" id="temp">--°</div>
+        <div class="city" id="city">Cargando...</div>
+    </div>
+
+    <script>
+        // Lógica simplificada para el widget
+        async function updateWidget() {
+            // 1. Obtener ubicación (o usar default MDQ)
+            let lat = -38.0023, lon = -57.5575;
+            
+            if (navigator.geolocation) {
+                try {
+                    const pos = await new Promise((res, rej) => 
+                        navigator.geolocation.getCurrentPosition(res, rej, {timeout: 5000}));
+                    lat = pos.coords.latitude;
+                    lon = pos.coords.longitude;
+                } catch (e) { console.warn("Ubicación no disponible, usando default"); }
+            }
+
+            // 2. Obtener Clima
+            try {
+                const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius`);
+                const d = await r.json();
+                const t = Math.round(d.current_weather.temperature);
+                
+                document.getElementById('temp').innerText = `${t}°`;
+
+                // Actualizar imagen según temperatura
+                const img = document.getElementById('star-img');
+                if (t <= 20) img.src = 'culonaazul.png';
+                else if (t >= 21 && t <= 23) img.src = 'culonavioleta.png';
+                else if (t >= 24) img.src = 'culonarosa.png';
+
+            } catch (e) { document.getElementById('temp').innerText = "--"; }
+
+            // 3. Obtener Ciudad (Reverse Geocoding simple)
+            try {
+                const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=es`);
+                const d = await r.json();
+                const city = d.address.city || d.address.town || "MDQ";
+                document.getElementById('city').innerText = city.includes("Mar del Plata") ? "La Feliz" : city;
+            } catch (e) { document.getElementById('city').innerText = "MDQ"; }
+        }
+
+        updateWidget();
+        // Actualizar cada 30 minutos
+        setInterval(updateWidget, 1800000);
+    </script>
+</body>
+</html>
